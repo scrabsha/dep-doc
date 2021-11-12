@@ -1,15 +1,19 @@
 //! Add a cute dependency declaration snippet in your crate documentation.
 //!
 //! # Adding to `Cargo.toml`
+//!
 #![doc = dep_doc!()]
 //!
 //! # Goal
 //!
-//! This crate aims to automate the dependency declaration snippet generation.
-//! It is really easy to forget to update it before running `cargo publish` or
-//! `cargo release`. This crate completely removes this source of error by
-//! providing the [`dep_doc`] macro, which always expands to the crate declared
-//! in the crate's `Cargo.toml` file.
+//! When writing Rust libraries, it is quite common to add a code snippet
+//! which shows to the end-user how to add the crate to the `Cargo.toml`. The
+//! problem is that there's no way to ensure that the crate name and version
+//! are correct before releasing a new version.
+//!
+//! This crate aims to automate the TOML snippet generation by providing
+//! macro-assisted solution which expand in the correct crate name and version.
+//! It does so by reading environment variables that are set by cargo itself.
 //!
 //! # Set up
 //!
@@ -33,6 +37,28 @@
 //!
 //! # Customization
 //!
+//! ## Using a path instead of a version
+//!
+//! It is not allowed to specify both a `version` and a `path` in a dependency
+//! declaration. As such, passing a `path = "..."` argument to `dep_doc`, will
+//! remove the `version` section:
+//!
+//! ```rust
+//! //! Some doc...
+//! #![doc = dep_doc::dep_doc!(path = "https://github.com/scrabsha/dep-doc")]
+//! //! Some other doc
+//! ```
+//!
+//! If invoked in `dep_doc`, this will generate the following documentation:
+//!
+//! > Some doc...
+//! > ```TOML
+//! > [dependencies]
+#![doc = concat!("> ", package_import!(path = "https://github.com/scrabsha/dep-doc"))]
+//! > ```
+//!
+//! ## Other customizations
+//!
 //! Some crates may document specific features, git repository, branches,
 //! commit hash, and so on. This can be addressed by passing code in the
 //! [`dep_doc`] invocation:
@@ -53,11 +79,13 @@
 //!
 //! # My library is better suited as a development dependency
 //!
-//! That's fine! [`dev_dep_doc`] generates the appropriate documentation.
+//! That's fine! [`dev_dep_doc`] generates the appropriate documentation. It
+//! replaces the `[dependencies]` section by a `[dev-dependencies]` one.
 
 #[doc(hidden)]
 pub use core;
 
+/// Generates a manifest
 #[macro_export]
 macro_rules! dep_doc {
     ( $( $tt:tt )* ) => {
@@ -83,12 +111,31 @@ macro_rules! dev_dep_doc {
 #[doc(hidden)]
 #[macro_export]
 macro_rules! package_import {
+    (path = $path:literal) => {
+        concat!(
+            crate::core::env!("CARGO_PKG_NAME"),
+            " = { path = \"",
+            $path,
+            "\" }"
+        )
+    };
     () => {
         concat!(
             $crate::core::env!("CARGO_PKG_NAME"),
             " = \"",
             $crate::core::env!("CARGO_PKG_VERSION"),
             "\"",
+        )
+    };
+
+    (path = $path:literal $( $tt:tt )+ ) => {
+        concat!(
+            $crate::core::env!("CARGO_PKG_NAME"),
+            " = { path = \"",
+            $path,
+            "\", ",
+            stringify!( $( $tt )+ ),
+            " }",
         )
     };
 
