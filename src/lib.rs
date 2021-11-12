@@ -37,35 +37,13 @@
 //!
 //! # Customization
 //!
-//! ## Using a path instead of a version
-//!
-//! It is not allowed to specify both a `version` and a `path` in a dependency
-//! declaration. As such, passing a `path = "..."` argument to `dep_doc`, will
-//! remove the `version` section:
-//!
-//! ```rust
-//! //! Some doc...
-//! #![doc = dep_doc::dep_doc!(path = "https://github.com/scrabsha/dep-doc")]
-//! //! Some other doc
-//! ```
-//!
-//! If invoked in `dep_doc`, this will generate the following documentation:
-//!
-//! > Some doc...
-//! > ```TOML
-//! > [dependencies]
-#![doc = concat!("> ", package_import!(path = "https://github.com/scrabsha/dep-doc"))]
-//! > ```
-//!
-//! ## Other customizations
-//!
 //! Some crates may document specific features, git repository, branches,
 //! commit hash, and so on. This can be addressed by passing code in the
 //! [`dep_doc`] invocation:
 //!
 //! ```rust
 //! //! Some doc...
-//! #![doc = dep_doc::dep_doc!(features = ["parse"])]
+//! #![doc = dep_doc::dep_doc!(git = "https://github.com/scrabsha/dep-doc")]
 //! //! Some other doc
 //! ```
 //!
@@ -73,7 +51,7 @@
 //!
 //! > Some doc...
 //! > ```TOML
-#![doc = concat!("> ", package_import!(features = ["parse"]))]
+#![doc = concat!("> ", package_import!(git = "https://github.com/scrabsha/dep-doc"))]
 //! > ```
 //! > Some other doc.
 //!
@@ -85,7 +63,27 @@
 #[doc(hidden)]
 pub use core;
 
-/// Generates a manifest
+/// Generates a `Cargo.toml` code snippet showing how to add the current crate
+/// as a dependency.
+///
+/// This crate expands to the correct docstring. As such, the `#![doc = ...]`
+/// macro must be used.
+///
+/// See the [crate-level documentation][crate] for more.
+///
+/// # Example
+///
+/// The simplest invocation is:
+///
+/// ```rust
+/// #![doc = dep_doc::dep_doc!()]
+/// ```
+///
+/// Specific feature, git repository, path can be passed in the macro invocation:
+///
+/// ```rust
+/// #![doc = dep_doc::dep_doc!(git = "https://github.com/scrabsha/dep-doc")]
+/// ```
 #[macro_export]
 macro_rules! dep_doc {
     ( $( $tt:tt )* ) => {
@@ -96,6 +94,23 @@ macro_rules! dep_doc {
         )
     };
 }
+
+/// Generates a `Cargo.toml` code snippet showing how to add the current crate
+/// as a dev-dependency.
+///
+/// # Example
+///
+/// The simplest invocation is:
+///
+/// ```rust
+/// #![doc = dep_doc::dev_dep_doc!()]
+/// ```
+///
+/// Specific feature, git repository, path can be passed in the macro invocation:
+///
+/// ```rust
+/// #![doc = dep_doc::dev_dep_doc!(git = "https://github.com/scrabsha/dep-doc")]
+/// ```
 
 #[macro_export]
 macro_rules! dev_dep_doc {
@@ -111,31 +126,12 @@ macro_rules! dev_dep_doc {
 #[doc(hidden)]
 #[macro_export]
 macro_rules! package_import {
-    (path = $path:literal) => {
-        concat!(
-            crate::core::env!("CARGO_PKG_NAME"),
-            " = { path = \"",
-            $path,
-            "\" }"
-        )
-    };
     () => {
         concat!(
             $crate::core::env!("CARGO_PKG_NAME"),
             " = \"",
             $crate::core::env!("CARGO_PKG_VERSION"),
             "\"",
-        )
-    };
-
-    (path = $path:literal $( $tt:tt )+ ) => {
-        concat!(
-            $crate::core::env!("CARGO_PKG_NAME"),
-            " = { path = \"",
-            $path,
-            "\", ",
-            stringify!( $( $tt )+ ),
-            " }",
         )
     };
 
