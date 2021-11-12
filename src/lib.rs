@@ -111,7 +111,6 @@ macro_rules! dep_doc {
 /// ```rust
 /// #![doc = dep_doc::dev_dep_doc!(git = "https://github.com/scrabsha/dep-doc")]
 /// ```
-
 #[macro_export]
 macro_rules! dev_dep_doc {
     ( $( $tt:tt )* ) => {
@@ -126,23 +125,73 @@ macro_rules! dev_dep_doc {
 #[doc(hidden)]
 #[macro_export]
 macro_rules! package_import {
-    () => {
+    (@inner [$name:expr, $version:expr $(,)? ]) => {
         concat!(
-            $crate::core::env!("CARGO_PKG_NAME"),
+            $name,
             " = \"",
-            $crate::core::env!("CARGO_PKG_VERSION"),
+            $version,
             "\"",
         )
     };
 
-    ( $( $tt:tt)+ ) => {
+    (@inner [$name:expr, $version:expr $(,)? ], [ $( $rest:tt )* ] ) => {
         concat!(
-            $crate::core::env!("CARGO_PKG_NAME"),
+            $name,
             " = { version = \"",
-            $crate::core::env!("CARGO_PKG_VERSION"),
+            $version,
             "\", ",
-            stringify!( $( $tt )+ ),
+            stringify!( $( $rest)* ),
             " }",
         )
+    };
+
+    () => {
+        $crate::package_import!(@inner [
+            $crate::core::env!("CARGO_PKG_NAME"),
+            $crate::core::env!("CARGO_PKG_VERSION"),
+        ])
+    };
+
+    ( $( $tt:tt )+ ) => {
+        $crate::package_import!(@inner [
+                $crate::core::env!("CARGO_PKG_NAME"),
+                $crate::core::env!("CARGO_PKG_VERSION"),
+            ],
+            [ $( $tt )* ]
+        )
+    };
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    mod package_import {
+        use super::*;
+
+        #[test]
+        fn no_additional_tokens() {
+            let left = package_import!(@inner ["tokio", "1.13.0"]);
+            let right = "tokio = \"1.13.0\"";
+
+            assert_eq!(left, right)
+        }
+
+        #[test]
+        fn with_git_path() {
+            let left = package_import!(@inner ["tokio", "1.13.0"], [git = "https://github.com/tokio-rs/tokio"]);
+            let right =
+                "tokio = { version = \"1.13.0\", git = \"https://github.com/tokio-rs/tokio\" }";
+
+            assert_eq!(left, right);
+        }
+
+        #[test]
+        fn with_feature() {
+            let left = package_import!(@inner ["tokio", "1.13.0"], [features = ["macros"]]);
+            let right = "tokio = { version = \"1.13.0\", features = [\"macros\"] }";
+
+            assert_eq!(left, right);
+        }
     }
 }
