@@ -15,7 +15,7 @@
 //! macro-assisted solution which expand in the correct crate name and version.
 //! It does so by reading environment variables that are set by cargo itself.
 //!
-//! # Set up
+//! # Usage
 //!
 //! To add the TOML snippet, insert the following line between two documentation
 //! lines:
