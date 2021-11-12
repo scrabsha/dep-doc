@@ -51,6 +51,7 @@
 //!
 //! > Some doc...
 //! > ```TOML
+//! > [dependencies]
 #![doc = concat!("> ", package_import!(git = "https://github.com/scrabsha/dep-doc"))]
 //! > ```
 //! > Some other doc.
