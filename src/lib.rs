@@ -23,7 +23,7 @@
 //! ```rust
 //! //! Some doc...
 //! #![doc = dep_doc::dep_doc!()]
-//! //! Some other doc.
+//! //! Some other doc
 //! ```
 //!
 //! If invoked in `dep_doc`, this will generates the following documentation:
@@ -33,7 +33,7 @@
 //! > [dependencies]
 #![doc = concat!("> ", package_import!())]
 //! > ```
-//! > Some other doc.
+//! > Some other doc
 //!
 //! # Customization
 //!
@@ -54,12 +54,27 @@
 //! > [dependencies]
 #![doc = concat!("> ", package_import!(git = "https://github.com/scrabsha/dep-doc"))]
 //! > ```
-//! > Some other doc.
+//! > Some other doc
 //!
 //! # My library is better suited as a development dependency
 //!
 //! That's fine! [`dev_dep_doc`] generates the appropriate documentation. It
 //! replaces the `[dependencies]` section by a `[dev-dependencies]` one.
+//!
+//! ```rust
+//! //! Some doc...
+//! #![doc = dep_doc::dev_dep_doc!(features = ["proc_macro", "no_std"])]
+//! //! Some other doc
+//! ```
+//!
+//! If invoked in `dep_doc`, this will generate the following documentation:
+//!
+//! > Some doc...
+//! > ```TOML
+//! > [dev-dependencies]
+#![doc = concat!("> ", package_import!(features = ["proc_macro", "no_std"]))]
+//! > ```
+//! > Some other doc
 
 #[doc(hidden)]
 pub use core;
