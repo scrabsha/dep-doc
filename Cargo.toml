@@ -2,5 +2,15 @@
 name = "dep_doc"
 version = "0.1.0"
 edition = "2018"
+authors = ["Sasha Pourcelot <sasha.pourcelot@protonmail.com"]
+rust-version = "1.54"
+description = "Add a cute dependency declaration snippet in your crate documentation"
+documentation = "https://docs.rs/dep_doc"
+# TODO: readme
+homepage = "https://github.com/scrabsha/dep-doc"
+repository = "https://github.com/scrabsha/dep-doc"
+license = "MIT OR Apache-2.0"
+# TODO: keywords
+# TODO: categories
 
 [dependencies]
