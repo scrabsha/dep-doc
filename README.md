@@ -76,6 +76,5 @@ If invoked in `dep_doc`, this will generate the following documentation:
 > ```TOML
 > [dev-dependencies]
 > dep_doc = { version = "0.1.0", features = ["prod_macro", "no_std"] }
-#![doc = concat!("> ", package_import!(features = ["proc_macro", "no_std"]))]
 > ```
 > Some other doc
