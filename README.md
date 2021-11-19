@@ -1,13 +1,15 @@
+# `dep_doc`
+
 Add a cute dependency declaration snippet in your crate documentation.
 
-# Adding to `Cargo.toml`
+## Adding to `Cargo.toml`
 
 ```TOML
 [dependencies]
 dep_doc = "0.1.0"
 ```
 
-# Goal
+## Goal
 
 When writing Rust libraries, it is quite common to add a code snippet
 which shows to the end-user how to add the crate to the `Cargo.toml`. The
@@ -18,7 +20,7 @@ This crate aims to automate the TOML snippet generation by providing
 macro-assisted solution which expand in the correct crate name and version.
 It does so by reading environment variables that are set by cargo itself.
 
-# Usage
+## Usage
 
 To add the TOML snippet, insert the following line between two documentation
 lines:
@@ -38,7 +40,7 @@ If invoked in `dep_doc`, this will generates the following documentation:
 > ```
 > Some other doc
 
-# Customization
+## Customization
 
 Some crates may document specific features, git repository, branches,
 commit hash, and so on. This can be addressed by passing code in the
@@ -59,7 +61,7 @@ If invoked in `dep_doc`, this will generate the following documentation:
 > ```
 > Some other doc
 
-# My library is better suited as a development dependency
+## My library is better suited as a development dependency
 
 That's fine! `dev_dep_doc` generates the appropriate documentation. It
 replaces the `[dependencies]` section by a `[dev-dependencies]` one.
