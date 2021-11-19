@@ -6,7 +6,7 @@ authors = ["Sasha Pourcelot <sasha.pourcelot@protonmail.com"]
 rust-version = "1.54"
 description = "Add a cute dependency declaration snippet in your crate documentation"
 documentation = "https://docs.rs/dep_doc"
-# TODO: readme
+readme = "https://github.com/scrabsha/dep-doc/blob/main/README.md"
 homepage = "https://github.com/scrabsha/dep-doc"
 repository = "https://github.com/scrabsha/dep-doc"
 license = "MIT OR Apache-2.0"
