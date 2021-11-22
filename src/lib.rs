@@ -105,7 +105,7 @@ macro_rules! dep_doc {
     ( $( $tt:tt )* ) => {
         concat!(
             "```TOML\n[dependencies]\n",
-            $crate::package_import!(),
+            $crate::package_import!($($tt)*),
             "\n```",
         )
     };
@@ -132,7 +132,7 @@ macro_rules! dev_dep_doc {
     ( $( $tt:tt )* ) => {
         concat!(
             "```TOML\n[dev-dependencies]\n",
-            $crate::package_import!(),
+            $crate::package_import!($($tt)*),
             "\n```",
         )
     };
