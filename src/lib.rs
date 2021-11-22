@@ -103,9 +103,22 @@ pub use core;
 #[macro_export]
 macro_rules! dep_doc {
     ( $( $tt:tt )* ) => {
+        $crate::dep_doc_inner!(
+            [$crate::core::env!("CARGO_PKG_NAME"), $crate::core::env!("CARGO_PKG_VERSION")],
+            [$($tt)*],
+        )
+    };
+}
+
+// This is just a testable version of `dep_doc`, in which we can inject a
+// specific crate name and version name.
+#[doc(hidden)]
+#[macro_export]
+macro_rules! dep_doc_inner {
+    ( [$name:expr, $version:expr], [ $( $tt:tt )* ] $(,)? ) => {
         concat!(
             "```TOML\n[dependencies]\n",
-            $crate::package_import!($($tt)*),
+            $crate::package_import!([$name, $version], [ $($tt)* ]),
             "\n```",
         )
     };
@@ -130,9 +143,22 @@ macro_rules! dep_doc {
 #[macro_export]
 macro_rules! dev_dep_doc {
     ( $( $tt:tt )* ) => {
+        $crate::dev_dep_doc_inner!(
+            [$crate::core::env!("CARGO_PKG_NAME"), $crate::core::env!("CARGO_PKG_VERSION")],
+            [$($tt)*],
+        )
+    };
+}
+
+// This is just a testable version of `dev_dep_doc`, in which we can inject a
+// specific crate name and version name.
+#[doc(hidden)]
+#[macro_export]
+macro_rules! dev_dep_doc_inner {
+    ( [$name:expr, $version:expr], [ $( $tt:tt )* ] $(,)? ) => {
         concat!(
             "```TOML\n[dev-dependencies]\n",
-            $crate::package_import!($($tt)*),
+            $crate::package_import!([$name, $version], [$($tt)*]),
             "\n```",
         )
     };
@@ -141,7 +167,7 @@ macro_rules! dev_dep_doc {
 #[doc(hidden)]
 #[macro_export]
 macro_rules! package_import {
-    (@inner [$name:expr, $version:expr $(,)? ]) => {
+    ([$name:expr, $version:expr $(,)? ], [] $(,)? ) => {
         concat!(
             $name,
             " = \"",
@@ -150,7 +176,7 @@ macro_rules! package_import {
         )
     };
 
-    (@inner [$name:expr, $version:expr $(,)? ], [ $( $rest:tt )* ] ) => {
+    ([$name:expr, $version:expr $(,)? ], [ $( $rest:tt )* ] $(,)? ) => {
         concat!(
             $name,
             " = { version = \"",
@@ -161,15 +187,9 @@ macro_rules! package_import {
         )
     };
 
-    () => {
-        $crate::package_import!(@inner [
-            $crate::core::env!("CARGO_PKG_NAME"),
-            $crate::core::env!("CARGO_PKG_VERSION"),
-        ])
-    };
-
-    ( $( $tt:tt )+ ) => {
-        $crate::package_import!(@inner [
+    ( $( $tt:tt )* ) => {
+        $crate::package_import!(
+            [
                 $crate::core::env!("CARGO_PKG_NAME"),
                 $crate::core::env!("CARGO_PKG_VERSION"),
             ],
@@ -182,12 +202,58 @@ macro_rules! package_import {
 mod tests {
     use super::*;
 
+    mod dep_doc_inner {
+        use super::*;
+
+        #[test]
+        fn no_additional_tokens() {
+            let left = dep_doc_inner!(["tokio", "1.13.0"], []);
+            let right = "```TOML\n[dependencies]\ntokio = \"1.13.0\"\n```";
+
+            assert_eq!(left, right);
+        }
+
+        #[test]
+        fn with_git_path() {
+            let left = dep_doc_inner!(
+                ["tokio", "1.13.0"],
+                [git = "https://github.com/tokio-rs/tokio"]
+            );
+            let right = "```TOML\n[dependencies]\ntokio = { version = \"1.13.0\", git = \"https://github.com/tokio-rs/tokio\" }\n```";
+
+            assert_eq!(left, right);
+        }
+    }
+
+    mod dev_dep_doc_inner {
+        use super::*;
+
+        #[test]
+        fn no_additional_tokens() {
+            let left = dev_dep_doc_inner!(["tokio", "1.13.0"], []);
+            let right = "```TOML\n[dev-dependencies]\ntokio = \"1.13.0\"\n```";
+
+            assert_eq!(left, right);
+        }
+
+        #[test]
+        fn with_git_path() {
+            let left = dev_dep_doc_inner!(
+                ["tokio", "1.13.0"],
+                [git = "https://github.com/tokio-rs/tokio"]
+            );
+            let right = "```TOML\n[dev-dependencies]\ntokio = { version = \"1.13.0\", git = \"https://github.com/tokio-rs/tokio\" }\n```";
+
+            assert_eq!(left, right);
+        }
+    }
+
     mod package_import {
         use super::*;
 
         #[test]
         fn no_additional_tokens() {
-            let left = package_import!(@inner ["tokio", "1.13.0"]);
+            let left = package_import!(["tokio", "1.13.0"], []);
             let right = "tokio = \"1.13.0\"";
 
             assert_eq!(left, right)
@@ -195,7 +261,10 @@ mod tests {
 
         #[test]
         fn with_git_path() {
-            let left = package_import!(@inner ["tokio", "1.13.0"], [git = "https://github.com/tokio-rs/tokio"]);
+            let left = package_import!(
+                ["tokio", "1.13.0"],
+                [git = "https://github.com/tokio-rs/tokio"]
+            );
             let right =
                 "tokio = { version = \"1.13.0\", git = \"https://github.com/tokio-rs/tokio\" }";
 
@@ -204,7 +273,7 @@ mod tests {
 
         #[test]
         fn with_feature() {
-            let left = package_import!(@inner ["tokio", "1.13.0"], [features = ["macros"]]);
+            let left = package_import!(["tokio", "1.13.0"], [features = ["macros"]]);
             let right = "tokio = { version = \"1.13.0\", features = [\"macros\"] }";
 
             assert_eq!(left, right);
