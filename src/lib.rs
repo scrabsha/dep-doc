@@ -202,6 +202,52 @@ macro_rules! package_import {
 mod tests {
     use super::*;
 
+    mod dep_doc_inner {
+        use super::*;
+
+        #[test]
+        fn no_additional_tokens() {
+            let left = dep_doc_inner!(["tokio", "1.13.0"], []);
+            let right = "```TOML\n[dependencies]\ntokio = \"1.13.0\"\n```";
+
+            assert_eq!(left, right);
+        }
+
+        #[test]
+        fn with_git_path() {
+            let left = dep_doc_inner!(
+                ["tokio", "1.13.0"],
+                [git = "https://github.com/tokio-rs/tokio"]
+            );
+            let right = "```TOML\n[dependencies]\ntokio = { version = \"1.13.0\", git = \"https://github.com/tokio-rs/tokio\" }\n```";
+
+            assert_eq!(left, right);
+        }
+    }
+
+    mod dev_dep_doc_inner {
+        use super::*;
+
+        #[test]
+        fn no_additional_tokens() {
+            let left = dev_dep_doc_inner!(["tokio", "1.13.0"], []);
+            let right = "```TOML\n[dev-dependencies]\ntokio = \"1.13.0\"\n```";
+
+            assert_eq!(left, right);
+        }
+
+        #[test]
+        fn with_git_path() {
+            let left = dev_dep_doc_inner!(
+                ["tokio", "1.13.0"],
+                [git = "https://github.com/tokio-rs/tokio"]
+            );
+            let right = "```TOML\n[dev-dependencies]\ntokio = { version = \"1.13.0\", git = \"https://github.com/tokio-rs/tokio\" }\n```";
+
+            assert_eq!(left, right);
+        }
+    }
+
     mod package_import {
         use super::*;
 
