@@ -1,5 +1,17 @@
 # `dep_doc`
 
+[![Build Status][actions-badge]][actions-url]
+[![Latest Version][version-badge]][version-url]
+[![Rust Documentation][docs-badge]][docs-url]
+
+[actions-badge]: https://github.com/scrabsha/dep-doc/actions/workflows/ci.yml/badge.svg
+[actions-url]: https://github.com/scrabsha/dep-doc/actions/workflows/ci.yml?query=branch%3Amain
+[version-badge]: https://img.shields.io/crates/v/dep_doc.svg
+[version-url]: https://crates.io/crates/dep_doc
+[docs-badge]: https://img.shields.io/badge/docs-latest-blue.svg
+[docs-url]: https://docs.rs/dep_doc
+
+
 Add a cute dependency declaration snippet in your crate documentation.
 
 ## Adding to `Cargo.toml`
