@@ -18,7 +18,7 @@ Add a cute dependency declaration snippet in your crate documentation.
 
 ```TOML
 [dependencies]
-dep_doc = "0.1.0"
+dep_doc = "0.1.1"
 ```
 
 ## Goal
@@ -48,7 +48,7 @@ If invoked in `dep_doc`, this will generates the following documentation:
 > Some doc...
 > ```TOML
 > [dependencies]
-> dep_doc = "0.1.0"
+> dep_doc = "0.1.1"
 > ```
 > Some other doc
 
@@ -69,7 +69,7 @@ If invoked in `dep_doc`, this will generate the following documentation:
 > Some doc...
 > ```TOML
 > [dependencies]
-> dep_doc = { version = "0.1.0", git = "https://github.com/scrabsha/dep-doc" }
+> dep_doc = { version = "0.1.1", git = "https://github.com/scrabsha/dep-doc" }
 > ```
 > Some other doc
 
@@ -89,7 +89,7 @@ If invoked in `dep_doc`, this will generate the following documentation:
 > Some doc...
 > ```TOML
 > [dev-dependencies]
-> dep_doc = { version = "0.1.0", features = ["prod_macro", "no_std"] }
+> dep_doc = { version = "0.1.1", features = ["prod_macro", "no_std"] }
 > ```
 > Some other doc
 
